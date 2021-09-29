@@ -70,5 +70,11 @@ fun Shop.getMostPopularProductInCity(): Map<City, Product> = this
     .toMap()
 
 // 9. Получить набор товаров, которые заказывали все покупатели.
-fun Shop.getProductsOrderedByAll(): Set<Product> = emptySet()
-
+fun Shop.getProductsOrderedByAll(): Set<Product> = this.customers
+    .asSequence().map { Pair(it, it.orders)}
+    .map { Pair(it.first, it.second.asSequence().map { it.products }.flatMap { it.asSequence().distinct() }.distinct()) }
+    .groupBy { it.first }
+    .asSequence()
+    .map { it.value.asSequence().flatMap { it.second }.toSet() }
+    .distinct()
+    .reduce { acc, set -> acc.intersect(set) }
