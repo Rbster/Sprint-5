@@ -2,8 +2,6 @@ package ru.sber.serialization
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
-import com.fasterxml.jackson.databind.introspect.AccessorNamingStrategy
-import com.fasterxml.jackson.databind.introspect.DefaultAccessorNamingStrategy
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -20,11 +18,11 @@ class JsonCustomNamingPropertyStrategyTest {
             """{"FIRSTNAME": "Иван", "LASTNAME": "Иванов", "MIDDLENAME": "Иванович", "PASSPORTNUMBER": "123456", "PASSPORTSERIAL": "1234", "BIRTHDATE": "1990-01-01"}"""
         val objectMapper = ObjectMapper()
             .registerModules(KotlinModule(), JavaTimeModule())
-//            .setPropertyNamingStrategy(object : PropertyNamingStrategy() {
-//                fun nameForField(): String? {
-//
-//                }
-//            })
+            .setPropertyNamingStrategy(object : PropertyNamingStrategy.PropertyNamingStrategyBase() {
+                override fun translate(default: String?): String {
+                    return default?.toUpperCase() ?: ""
+                }
+            })
         // when
         val client = objectMapper.readValue<Client1>(data)
 
